@@ -2,7 +2,7 @@ from tortoise.models import Model
 from tortoise import fields
 from tortoise.validators import MaxValueValidator, MinValueValidator
 
-from validators import SlugValidator
+# from validators import SlugValidator
 
 
 NULL: int = 0
@@ -18,8 +18,8 @@ class User(Model):
 
 class Type(Model):
     id = fields.SmallIntField(pk=True,)
-    name = fields.CharField(max_length=256, unique=True,)
-    slug = fields.CharField(max_length=256, validators=[SlugValidator],)
+    name = fields.CharField(max_length=256, unique=True, null=True,)
+    slug = fields.CharField(max_length=256,)  # validators=[SlugValidator],)
 
 
 class Title(Model):
@@ -43,6 +43,7 @@ class Title(Model):
     director = fields.CharField(max_length=256, null=True,)
     release_year = fields.SmallIntField(validators=[MinValueValidator(NULL)],)
     genre = fields.CharField(max_length=256, null=True,)
+    image_url = fields.CharField(max_length=1024, null=True)
 
 
 class UserTitle(Model):

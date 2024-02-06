@@ -22,3 +22,13 @@ async def search_title(query: str) -> list[dict[str, str]]:
     response = await search(query, session())
     clean_response = await clean_search_response(response)
     return clean_response.get('titles')
+
+
+async def get_director_from_response(persons):
+    if not persons:
+        return
+    directors: str = ''
+    for person in persons:
+        if person.get('enProfession') == 'director':
+            directors += f'{person.get('name')},'
+    return directors[:-1]
