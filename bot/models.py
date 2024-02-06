@@ -2,7 +2,7 @@ from tortoise.models import Model
 from tortoise import fields
 from tortoise.validators import MaxValueValidator, MinValueValidator
 
-from bot.validators import SlugValidator
+from validators import SlugValidator
 
 
 NULL: int = 0
@@ -11,6 +11,9 @@ MAX_RATING_NUMBER: int = 10
 
 class User(Model):
     id = fields.IntField(pk=True,)
+    username = fields.CharField(max_length=512,)
+    first_name = fields.CharField(max_length=512, null=True,)
+    last_name = fields.CharField(max_length=512, null=True,)
 
 
 class Type(Model):
@@ -40,3 +43,16 @@ class Title(Model):
     director = fields.CharField(max_length=256, null=True,)
     release_year = fields.SmallIntField(validators=[MinValueValidator(NULL)],)
     genre = fields.CharField(max_length=256, null=True,)
+
+
+class UserTitle(Model):
+    user = fields.ForeignKeyField(
+        'models.User',
+        related_name='user_title',
+        on_delete=fields.OnDelete.CASCADE
+    )
+    title = fields.ForeignKeyField(
+        'models.Title',
+        related_name='user_title',
+        on_delete=fields.OnDelete.CASCADE,
+    )

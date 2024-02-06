@@ -9,10 +9,12 @@ from config import (
 )
 
 TORTOISE_ORM = {
-    'connections': {'default': f'postgres://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}'},
+    'connections': {
+        'default': f'postgres://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}'
+    },
     'apps': {
         'models': {
-            'models': ['bot.models', 'aerich.models'],
+            'models': ['models', 'aerich.models'],
             'default_connection': 'default',
         },
     },

@@ -14,3 +14,6 @@ POSTGRES_DB: str = getenv('POSTGRES_DB')
 
 # BOT
 BOT_TOKEN: str = getenv('BOT_TOKEN')
+
+# REQUESTS TOKENS
+KINOPOISK_TOKEN: str = getenv('KINOPOISK_TOKEN')
