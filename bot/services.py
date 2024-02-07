@@ -55,10 +55,17 @@ async def get_user(username: str) -> User:
     return await User.get(username=username)
 
 
-async def add_title_to_collection(title_id: int, username: str) -> None:
+async def add_title_to_collection(title_id: int, user: User) -> Title:
     title = await get_or_create_title(title_id)
-    user = await get_user(username)
-    await UserTitle.get_or_create(
+    _, is_created = await UserTitle.get_or_create(
         user=user,
         title=title,
     )
+    return title, is_created
+
+
+async def get_user_collection(user: User) -> list[Title]:
+    titles = await Title.filter(
+        user_title__user=user
+    )
+    return titles

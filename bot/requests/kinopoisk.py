@@ -13,8 +13,9 @@ async def search(
         url=k.SEARCH.value.format(query),
         headers=HEADERS,
     ) as response:
-        await session.close()
-        return await response.json()
+        resp = await response.json()
+        # await session.close()
+        return resp
 
 
 async def get_title_data(title_id: int, session: ClientSession) -> dict:
@@ -22,5 +23,6 @@ async def get_title_data(title_id: int, session: ClientSession) -> dict:
         url=k.GET_TITLE.value.format(title_id),
         headers=HEADERS,
     ) as response:
-        await session.close()
-        return await response.json()
+        resp = await response.json()
+        # await session.close()
+        return resp
