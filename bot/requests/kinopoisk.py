@@ -14,7 +14,6 @@ async def search(
         headers=HEADERS,
     ) as response:
         resp = await response.json()
-        # await session.close()
         return resp
 
 
@@ -24,5 +23,4 @@ async def get_title_data(title_id: int, session: ClientSession) -> dict:
         headers=HEADERS,
     ) as response:
         resp = await response.json()
-        # await session.close()
         return resp

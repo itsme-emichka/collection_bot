@@ -1,5 +1,6 @@
 from requests.client_session import session
 from requests.kinopoisk import search
+from models import Title
 
 
 async def clean_search_response(response: dict[str, dict[str, str]]) -> str:
@@ -32,3 +33,15 @@ async def get_director_from_response(persons):
         if person.get('enProfession') == 'director':
             directors += f'{person.get('name')},'
     return directors[:-1]
+
+
+async def get_title_detail_info(title: Title) -> str:
+    return f'''<strong>{title.name}</strong> ({title.release_year})
+
+<strong>Рейтинг IMDB:</strong> {title.rating}
+<strong>Жанр:</strong> {title.genre}
+<strong>Режиссеры:</strong>
+{title.director}
+
+<strong>Описание:</strong>
+{title.description}'''  # **Тип произведения:** {title.type}

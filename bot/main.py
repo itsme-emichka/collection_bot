@@ -1,6 +1,7 @@
 import asyncio
 from aiogram import Dispatcher, Bot
 from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.enums.parse_mode import ParseMode
 
 from config import BOT_TOKEN
 from handlers.start import start_router
@@ -9,7 +10,7 @@ import database
 
 
 async def main():
-    bot = Bot(BOT_TOKEN)
+    bot = Bot(BOT_TOKEN, parse_mode=ParseMode.HTML)
     dp = Dispatcher(storage=MemoryStorage())
     dp.include_routers(start_router, collection_router)
     await database.setup()

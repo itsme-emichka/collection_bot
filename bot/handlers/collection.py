@@ -1,14 +1,15 @@
 from aiogram import Router, types, F
 from aiogram.types import Message
-from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.filters import Command
+from aiogram.types.inline_keyboard_markup import InlineKeyboardMarkup
 
-from utils import search_title as search
+from utils import search_title as search, get_title_detail_info
 from services import (
     add_title_to_collection,
     get_user,
     get_user_collection,
-    remove_title_from_collection
+    remove_title_from_collection,
+    get_title,
 )
 
 from texts.messages import Text as t
@@ -24,18 +25,19 @@ async def my_collection(msg: Message) -> None:
     titles = await get_user_collection(user)
     for title in titles:
         answer_text: str = (
-            f'{title.name}\n' +
-            f'{title.release_year}\n' +
-            f'{title.description}...'
+            f'<strong>{title.name}</strong> ({title.release_year})\n' +
+            f'{title.description}'
         )
-        builder = InlineKeyboardBuilder()
-        builder.add(
-            types.InlineKeyboardButton(
-                text='Удалить из коллекции',
-                callback_data=f'delete_{title.id}'
-            )
+        btn1 = types.InlineKeyboardButton(
+            text='Удалить из коллекции',
+            callback_data=f'delete_{title.id}'
         )
-        await msg.answer(answer_text, reply_markup=builder.as_markup())
+        btn2 = types.InlineKeyboardButton(
+            text='Подробнее',
+            callback_data=f'detail_{title.id}'
+        )
+        markup = InlineKeyboardMarkup(inline_keyboard=[[btn1, btn2]])
+        await msg.answer(answer_text, reply_markup=markup)
 
 
 @collection_router.callback_query(F.data.startswith('delete_'))
@@ -48,24 +50,29 @@ async def delete_from_collection(callback: types.CallbackQuery) -> None:
     await callback.answer()
 
 
+@collection_router.callback_query(F.data.startswith('detail_'))
+async def detail_title(callback: types.CallbackQuery) -> None:
+    id = callback.data.split('_')[-1]
+    title = await get_title(id)
+    await callback.message.answer_photo(title.image_url)
+    await callback.message.answer(await get_title_detail_info(title))
+
+
 @collection_router.message()
 async def search_title(msg: Message) -> None:
     titles = await search(msg.text)
     for title in titles[:5]:
         answer_text: str = (
-            f'{title.get('id')}\n' +
-            f'{title.get('name')}\n' +
-            f'{title.get('year')}\n' +
+            f'<strong>{title.get('name')}</strong> ({title.get('year')})\n' +
+            # f'{title.get('')}'
             f'{title.get('description')[:300]}...'
         )
-        builder = InlineKeyboardBuilder()
-        builder.add(
-            types.InlineKeyboardButton(
-                text='Коллекционировать',
-                callback_data=f'id_{title.get('id')}'
-            )
+        btn1 = types.InlineKeyboardButton(
+            text='Коллекционировать',
+            callback_data=f'id_{title.get('id')}'
         )
-        await msg.answer(answer_text, reply_markup=builder.as_markup())
+        markup = InlineKeyboardMarkup(inline_keyboard=[[btn1]])
+        await msg.answer(answer_text, reply_markup=markup)
 
 
 @collection_router.callback_query(F.data.startswith('id_'))

@@ -73,3 +73,7 @@ async def get_user_collection(user: User) -> list[Title]:
 
 async def remove_title_from_collection(user: User, title_id: int) -> None:
     await UserTitle.filter(user=user, title_id=title_id).delete()
+
+
+async def get_title(title_id: int) -> Title:
+    return await Title.get_or_none(id=title_id)
