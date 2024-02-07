@@ -4,7 +4,12 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.filters import Command
 
 from utils import search_title as search
-from services import add_title_to_collection, get_user, get_user_collection
+from services import (
+    add_title_to_collection,
+    get_user,
+    get_user_collection,
+    remove_title_from_collection
+)
 
 from texts.messages import Text as t
 
@@ -19,12 +24,28 @@ async def my_collection(msg: Message) -> None:
     titles = await get_user_collection(user)
     for title in titles:
         answer_text: str = (
-            f'{title.id}\n' +
             f'{title.name}\n' +
             f'{title.release_year}\n' +
             f'{title.description}...'
         )
-        await msg.answer(answer_text)
+        builder = InlineKeyboardBuilder()
+        builder.add(
+            types.InlineKeyboardButton(
+                text='Удалить из коллекции',
+                callback_data=f'delete_{title.id}'
+            )
+        )
+        await msg.answer(answer_text, reply_markup=builder.as_markup())
+
+
+@collection_router.callback_query(F.data.startswith('delete_'))
+async def delete_from_collection(callback: types.CallbackQuery) -> None:
+    id = callback.data.split('_')[-1]
+    username = callback.message.chat.username
+    user = await get_user(username)
+    await remove_title_from_collection(user, id)
+    await callback.message.answer(t.REMOVED.value)
+    await callback.answer()
 
 
 @collection_router.message()
