@@ -6,3 +6,7 @@ class Markup(Enum):
     DETAIL: str = 'Подробнее'
     DELETE: str = 'Удалить'
     COLLECT: str = 'Коллекционировать'
+    MOVIE: str = 'Кино'
+    SERIES: str = 'Сериалы'
+    ANIME: str = 'Аниме'
+    CARTOON: str = 'Мультфильмы'

@@ -76,9 +76,10 @@ async def add_title_to_collection(kinopoisk_id: int, user: User) -> Title:
     return title, is_created
 
 
-async def get_user_collection(user: User) -> list[Title]:
+async def get_user_collection(user: User, **filters) -> list[Title]:
     titles = await Title.filter(
-        user_title__user=user
+        user_title__user=user,
+        **filters
     ).prefetch_related(
         Prefetch(
             'type',

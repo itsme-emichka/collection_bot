@@ -12,3 +12,4 @@ class Text(Enum):
     ADD_TO_COLLECTION: str = 'Произведение "{}" успешно добавлено в коллекцию!'
     ALREADY_IN_COLLECTION: str = 'Произведение уже было добавлено в коллекцию!'
     REMOVED: str = 'Произведение удалено из коллекции.'
+    CHOOSE_TYPE: str = 'Выбери тип произведения.'

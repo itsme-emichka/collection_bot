@@ -50,6 +50,63 @@ async def my_collection(msg: Message) -> None:
         )
 
 
+@collection_router.message(Command('filter'))
+async def filter_collection(msg: types.Message) -> None:
+    btn1 = types.InlineKeyboardButton(
+        text=m.MOVIE.value,
+        callback_data='filter_movie',
+    )
+    btn2 = types.InlineKeyboardButton(
+        text=m.SERIES.value,
+        callback_data='filter_series',
+    )
+    btn3 = types.InlineKeyboardButton(
+        text=m.CARTOON.value,
+        callback_data='filter_cartoon',
+    )
+    btn4 = types.InlineKeyboardButton(
+        text=m.ANIME.value,
+        callback_data='filter_anime',
+    )
+    markup = InlineKeyboardMarkup(
+        inline_keyboard=[[btn1, btn2], [btn3, btn4]]
+    )
+    await msg.answer(
+        t.CHOOSE_TYPE.value,
+        reply_markup=markup
+    )
+
+
+@collection_router.callback_query(F.data.startswith('filter_'))
+async def get_filtered_collection(callback: types.CallbackQuery) -> None:
+    username = callback.message.chat.username
+    filters = {'type__slug': callback.data.split('_')[-1]}
+    user = await get_user(username)
+    titles = await get_user_collection(user, **filters)
+
+    for title in titles:
+        answer_text: str = await get_text_for_collection(title)
+        btn1 = types.InlineKeyboardButton(
+            text=m.DELETE_FROM_COLLECTION.value,
+            callback_data=f'delete_{title.id}'
+        )
+        btn2 = types.InlineKeyboardButton(
+            text=m.DETAIL.value,
+            callback_data=f'detail_{title.kinopoisk_id}'
+        )
+        markup = InlineKeyboardMarkup(inline_keyboard=[[btn1, btn2]])
+
+        await callback.message.answer_photo(
+            title.image_url,
+            disable_notification=True,
+        )
+        await callback.message.answer(
+            answer_text,
+            reply_markup=markup,
+            disable_notification=True,
+        )
+
+
 @collection_router.message()
 async def search_title(msg: Message) -> None:
     titles = await search(msg.text)
