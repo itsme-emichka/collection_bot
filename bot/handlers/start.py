@@ -14,7 +14,8 @@ async def start(msg: Message) -> None:
     username: str = msg.chat.username
     first_name: str = msg.chat.first_name
     last_name: str = msg.chat.last_name
-    btn = KeyboardButton(text='/collection')
-    markup = ReplyKeyboardMarkup(keyboard=[[btn]], resize_keyboard=True)
+    btn1 = KeyboardButton(text='/collection')
+    btn2 = KeyboardButton(text='/filter')
+    markup = ReplyKeyboardMarkup(keyboard=[[btn1, btn2]], resize_keyboard=True)
     await msg.answer(t.START, reply_markup=markup)
     await get_or_create_user(username, first_name, last_name)
