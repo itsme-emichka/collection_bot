@@ -96,10 +96,10 @@ async def delete_from_collection(callback: types.CallbackQuery) -> None:
 
 @collection_router.callback_query(F.data.startswith('id_'))
 async def add_to_collection(callback: types.CallbackQuery) -> None:
-    id = callback.data.split('_')[-1]
+    kinopoisk_id = callback.data.split('_')[-1]
     username = callback.message.chat.username
     user = await get_user(username)
-    title, is_created = await add_title_to_collection(id, user)
+    title, is_created = await add_title_to_collection(kinopoisk_id, user)
 
     if not is_created:
         await callback.message.answer(t.ALREADY_IN_COLLECTION.value)

@@ -23,20 +23,20 @@ async def get_or_create_type(slug: str) -> Type:
     return title_type
 
 
-async def get_title(title_id: int) -> Title:
+async def get_title(kinopoisk_id: int) -> Title:
     return await Title.all().prefetch_related(
         Prefetch(
             'type',
             queryset=Type.all().select_related(),
             to_attr='title_type',
         )
-    ).get(kinopoisk_id=title_id)
+    ).get(kinopoisk_id=kinopoisk_id)
 
 
-async def get_or_create_title(title_id: int) -> Title:
-    if await Title.filter(kinopoisk_id=title_id).exists():
-        return await get_title(title_id)
-    data = await get_title_data(title_id, session())
+async def get_or_create_title(kinopoisk_id: int) -> Title:
+    if await Title.filter(kinopoisk_id=kinopoisk_id).exists():
+        return await get_title(kinopoisk_id)
+    data = await get_title_data(kinopoisk_id, session())
 
     kinopoisk_id: int = data.get('id', None)
     name: str = data.get('name', None)
@@ -67,8 +67,8 @@ async def get_user(username: str) -> User:
     return await User.get(username=username)
 
 
-async def add_title_to_collection(title_id: int, user: User) -> Title:
-    title = await get_or_create_title(title_id)
+async def add_title_to_collection(kinopoisk_id: int, user: User) -> Title:
+    title = await get_or_create_title(kinopoisk_id)
     _, is_created = await UserTitle.get_or_create(
         user=user,
         title=title,
