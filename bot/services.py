@@ -1,7 +1,9 @@
+from tortoise.query_utils import Prefetch
+
 from models import User, UserTitle, Title, Type
 from requests.kinopoisk import get_title_data
-from utils import get_director_from_response
 from requests.client_session import session
+from utils import get_director_from_response
 
 
 async def get_or_create_user(
@@ -21,9 +23,19 @@ async def get_or_create_type(slug: str) -> Type:
     return title_type
 
 
+async def get_title(title_id: int) -> Title:
+    return await Title.all().prefetch_related(
+        Prefetch(
+            'type',
+            queryset=Type.all().select_related(),
+            to_attr='title_type',
+        )
+    ).get(kinopoisk_id=title_id)
+
+
 async def get_or_create_title(title_id: int) -> Title:
     if await Title.filter(kinopoisk_id=title_id).exists():
-        return await Title.get(kinopoisk_id=title_id)
+        return await get_title(title_id)
     data = await get_title_data(title_id, session())
 
     kinopoisk_id: int = data.get('id', None)
@@ -48,7 +60,7 @@ async def get_or_create_title(title_id: int) -> Title:
         image_url=image_url,
     )
 
-    return title
+    return await get_title(title.kinopoisk_id)
 
 
 async def get_user(username: str) -> User:
@@ -67,13 +79,15 @@ async def add_title_to_collection(title_id: int, user: User) -> Title:
 async def get_user_collection(user: User) -> list[Title]:
     titles = await Title.filter(
         user_title__user=user
+    ).prefetch_related(
+        Prefetch(
+            'type',
+            queryset=Type.all().select_related(),
+            to_attr='title_type',
+        )
     )
     return titles
 
 
 async def remove_title_from_collection(user: User, title_id: int) -> None:
     await UserTitle.filter(user=user, title_id=title_id).delete()
-
-
-async def get_title(title_id: int) -> Title:
-    return await Title.get_or_none(id=title_id)
