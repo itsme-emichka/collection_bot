@@ -20,10 +20,10 @@
 - Kinopoisk API
 - Docker
 
-## Автор:
-**Имя:** Эмилар Локтев 
-**Telegram:** @itsme_emichka
-**Почта:** emilar-l@yandex.ru
+## Автор:  
+**Имя:** Эмилар Локтев   
+**Telegram:** @itsme_emichka  
+**Почта:** emilar-l@yandex.ru  
 ## Как запустить проект (WIP)
 1. **Клонировать репозиторий**  
 `git clone https://github.com/itsme-emichka/collection_bot
