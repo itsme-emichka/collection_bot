@@ -1,4 +1,0 @@
-[tool.aerich]
-tortoise_orm = "bot.database.TORTOISE_ORM"
-location = "bot/migrations"
-src_folder = "./."
