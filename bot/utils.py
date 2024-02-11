@@ -44,7 +44,7 @@ async def get_title_detail_info(title: Title) -> str:
     return f'''<strong>{title.name}</strong> ({title.release_year})
 
 <strong>Рейтинг IMDB:</strong> {title.rating}
-<strong>Жанр:</strong> {title.genre}
+<strong>Жанры:</strong> {title.genre}
 <strong>Тип произведения:</strong> {title.title_type.slug}
 <strong>Режиссеры:</strong>
 {title.director}
@@ -56,7 +56,7 @@ async def get_title_detail_info(title: Title) -> str:
 async def get_text_for_collection(title: Title) -> str:
     return (
         f'<strong>{title.name}</strong> ({title.release_year})\n' +
-        f'<strong>Жанр:</strong> {title.genre}\n' +
+        f'<strong>Жанры:</strong> {title.genre}\n' +
         f'<strong>Тип:</strong> {title.title_type.slug}\n' +
         f'<strong>Режиссеры:</strong> {title.director}'
     )
@@ -70,5 +70,9 @@ async def get_text_for_search(title: dict[str, Any]) -> str:
 
 
 async def send_photo_if_exists(msg: types.Message, image_url: str) -> None:
-    if image_url:
+    try:
         await msg.answer_photo(image_url, disable_notification=True,)
+    except Exception as ex:
+        print(ex)
+        await msg.answer_photo('https://imgur.com/a/Rvf8nLd')
+        await msg.answer('Фото не найдено((')

@@ -45,7 +45,8 @@ async def get_or_create_title(kinopoisk_id: int) -> Title:
     rating: float = data.get('rating', dict()).get('imdb', None)
     director: str = await get_director_from_response(data.get('persons', None))
     release_year: int = data.get('year', None)
-    genre: str = data.get('genres', [dict()])[0].get('name', None)
+    genre: str = ''.join(
+        (f'{genre.get('name')}, ' for genre in data.get('genres')))
     image_url: str = data.get('poster', dict()).get('url', None)
 
     title = await Title.create(
@@ -56,7 +57,7 @@ async def get_or_create_title(kinopoisk_id: int) -> Title:
         rating=rating,
         director=director,
         release_year=release_year,
-        genre=genre,
+        genre=genre[:-2],
         image_url=image_url,
     )
 
