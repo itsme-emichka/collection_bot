@@ -1,7 +1,6 @@
 from aiogram import Router, types, F
 from aiogram.types import Message
 from aiogram.filters import Command
-from aiogram.types.inline_keyboard_markup import InlineKeyboardMarkup
 
 from utils import (
     search_title as search,
@@ -19,10 +18,16 @@ from services import (
 )
 
 from texts.messages import Text as t
-from texts.markups import Markup as m
+from markups.inline_markups import (
+    get_collection_markup,
+    get_filter_markup,
+    get_search_markup,
+)
 
 
 collection_router: Router = Router(name=__name__)
+
+TITLES_NUM_IN_SEARCH: int = 5
 
 
 @collection_router.message(Command('collection'))
@@ -32,49 +37,19 @@ async def my_collection(msg: Message) -> None:
     titles = await get_user_collection(user)
 
     for title in titles:
-        answer_text: str = await get_text_for_collection(title)
-        btn1 = types.InlineKeyboardButton(
-            text=m.DELETE_FROM_COLLECTION.value,
-            callback_data=f'delete_{title.id}'
-        )
-        btn2 = types.InlineKeyboardButton(
-            text=m.DETAIL.value,
-            callback_data=f'detail_{title.kinopoisk_id}'
-        )
-        markup = InlineKeyboardMarkup(inline_keyboard=[[btn1, btn2]])
-
         await send_photo_if_exists(msg, title.image_url)
         await msg.answer(
-            answer_text,
-            reply_markup=markup,
+            await get_text_for_collection(title),
+            reply_markup=get_collection_markup(title),
             disable_notification=True,
         )
 
 
 @collection_router.message(Command('filter'))
 async def filter_collection(msg: types.Message) -> None:
-    btn1 = types.InlineKeyboardButton(
-        text=m.MOVIE.value,
-        callback_data='filter_movie',
-    )
-    btn2 = types.InlineKeyboardButton(
-        text=m.SERIES.value,
-        callback_data='filter_series',
-    )
-    btn3 = types.InlineKeyboardButton(
-        text=m.CARTOON.value,
-        callback_data='filter_cartoon',
-    )
-    btn4 = types.InlineKeyboardButton(
-        text=m.ANIME.value,
-        callback_data='filter_anime',
-    )
-    markup = InlineKeyboardMarkup(
-        inline_keyboard=[[btn1, btn2], [btn3, btn4]]
-    )
     await msg.answer(
         t.CHOOSE_TYPE.value,
-        reply_markup=markup
+        reply_markup=get_filter_markup()
     )
 
 
@@ -86,21 +61,10 @@ async def get_filtered_collection(callback: types.CallbackQuery) -> None:
     titles = await get_user_collection(user, **filters)
 
     for title in titles:
-        answer_text: str = await get_text_for_collection(title)
-        btn1 = types.InlineKeyboardButton(
-            text=m.DELETE_FROM_COLLECTION.value,
-            callback_data=f'delete_{title.id}'
-        )
-        btn2 = types.InlineKeyboardButton(
-            text=m.DETAIL.value,
-            callback_data=f'detail_{title.kinopoisk_id}'
-        )
-        markup = InlineKeyboardMarkup(inline_keyboard=[[btn1, btn2]])
-
         await send_photo_if_exists(callback.message, title.image_url)
         await callback.message.answer(
-            answer_text,
-            reply_markup=markup,
+            await get_text_for_collection(title),
+            reply_markup=get_collection_markup(title),
             disable_notification=True,
         )
 
@@ -108,21 +72,11 @@ async def get_filtered_collection(callback: types.CallbackQuery) -> None:
 @collection_router.message()
 async def search_title(msg: Message) -> None:
     titles = await search(msg.text)
-    for title in titles[:5]:
-        answer_text: str = await get_text_for_search(title)
-        btn1 = types.InlineKeyboardButton(
-            text=m.COLLECT.value,
-            callback_data=f'id_{title.get('id')}'
-        )
-        btn2 = types.InlineKeyboardButton(
-            text=m.DETAIL.value,
-            callback_data=f'detail_{title.get('id')}'
-        )
-        markup = InlineKeyboardMarkup(inline_keyboard=[[btn1, btn2]])
+    for title in titles[:TITLES_NUM_IN_SEARCH]:
         await send_photo_if_exists(msg, title.get('image', None))
         await msg.answer(
-            answer_text,
-            reply_markup=markup,
+            await get_text_for_search(title),
+            reply_markup=get_search_markup(title.get('id')),
             disable_notification=True,
         )
 
