@@ -2,8 +2,6 @@ from tortoise.models import Model
 from tortoise import fields
 from tortoise.validators import MaxValueValidator, MinValueValidator
 
-# from validators import SlugValidator
-
 
 NULL: int = 0
 MAX_RATING_NUMBER: int = 10
@@ -19,7 +17,7 @@ class User(Model):
 class Type(Model):
     id = fields.SmallIntField(pk=True,)
     name = fields.CharField(max_length=256, unique=True, null=True,)
-    slug = fields.CharField(max_length=256,)  # validators=[SlugValidator],)
+    slug = fields.CharField(max_length=256,)
 
 
 class Title(Model):
@@ -45,6 +43,12 @@ class Title(Model):
     genre = fields.CharField(max_length=256, null=True,)
     image_url = fields.CharField(max_length=1024, null=True)
 
+    def __str__(self) -> str:
+        return self.name
+
+    class Meta:
+        ordering = ('type', 'name')
+
 
 class UserTitle(Model):
     user = fields.ForeignKeyField(
@@ -57,3 +61,4 @@ class UserTitle(Model):
         related_name='user_title',
         on_delete=fields.OnDelete.CASCADE,
     )
+    is_watched = fields.BooleanField(default=False,)
