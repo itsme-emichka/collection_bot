@@ -7,7 +7,8 @@ from utils import (
     search_title as search,
     get_title_detail_info,
     get_text_for_collection,
-    get_text_for_search
+    get_text_for_search,
+    send_photo_if_exists,
 )
 from services import (
     add_title_to_collection,
@@ -42,7 +43,7 @@ async def my_collection(msg: Message) -> None:
         )
         markup = InlineKeyboardMarkup(inline_keyboard=[[btn1, btn2]])
 
-        await msg.answer_photo(title.image_url, disable_notification=True,)
+        await send_photo_if_exists(msg, title.image_url)
         await msg.answer(
             answer_text,
             reply_markup=markup,
@@ -96,10 +97,7 @@ async def get_filtered_collection(callback: types.CallbackQuery) -> None:
         )
         markup = InlineKeyboardMarkup(inline_keyboard=[[btn1, btn2]])
 
-        await callback.message.answer_photo(
-            title.image_url,
-            disable_notification=True,
-        )
+        await send_photo_if_exists(callback.message, title.image_url)
         await callback.message.answer(
             answer_text,
             reply_markup=markup,
@@ -121,8 +119,7 @@ async def search_title(msg: Message) -> None:
             callback_data=f'detail_{title.get('id')}'
         )
         markup = InlineKeyboardMarkup(inline_keyboard=[[btn1, btn2]])
-
-        await msg.answer_photo(title.get('image'), disable_notification=True,)
+        await send_photo_if_exists(msg, title.get('image', None))
         await msg.answer(
             answer_text,
             reply_markup=markup,
@@ -135,7 +132,7 @@ async def detail_title(callback: types.CallbackQuery) -> None:
     id = callback.data.split('_')[-1]
     title = await get_or_create_title(id)
 
-    await callback.message.answer_photo(title.image_url)
+    await send_photo_if_exists(callback.message, title.image_url)
     await callback.message.answer(await get_title_detail_info(title),)
     await callback.answer()
 

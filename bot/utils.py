@@ -1,5 +1,7 @@
 from typing import Any
 
+from aiogram import types
+
 from requests.client_session import session
 from requests.kinopoisk import search
 from models import Title
@@ -65,3 +67,8 @@ async def get_text_for_search(title: dict[str, Any]) -> str:
         f'<strong>{title.get('name')}</strong> ({title.get('year')})\n' +
         f'{title.get('description')[:300]}...'
     )
+
+
+async def send_photo_if_exists(msg: types.Message, image_url: str) -> None:
+    if image_url:
+        await msg.answer_photo(image_url, disable_notification=True,)
