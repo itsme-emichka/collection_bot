@@ -46,9 +46,6 @@ class Title(Model):
     def __str__(self) -> str:
         return self.name
 
-    class Meta:
-        ordering = ('type', 'name')
-
 
 class UserTitle(Model):
     user = fields.ForeignKeyField(
@@ -61,4 +58,3 @@ class UserTitle(Model):
         related_name='user_title',
         on_delete=fields.OnDelete.CASCADE,
     )
-    is_watched = fields.BooleanField(default=False,)
